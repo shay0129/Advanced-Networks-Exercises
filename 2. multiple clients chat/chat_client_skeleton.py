@@ -1,7 +1,9 @@
+# chat_client_skeleton.py - A simple chat client that connects to a chat server and sends messages
+
 import socket
 import select
 import msvcrt
-import protocol
+import chat_protocol_skeleton as protocol
 
 def send_message(socket, message):
     '''Send a message to the socket.'''

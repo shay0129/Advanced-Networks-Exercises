@@ -1,3 +1,5 @@
+# chat_protocol_skeleton.py - Constants and commands for the chat client and server
+
 # Constants for the server
 SERVER_IP = "127.0.0.1"
 SERVER_PORT = 7777

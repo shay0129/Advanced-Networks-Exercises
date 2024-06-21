@@ -1,3 +1,5 @@
+# SMTP_protocol.py - Constants and commands for the SMTP client and server
+
 PORT = 25   # Standard SMTP port for sending emails
 
 # Server responses

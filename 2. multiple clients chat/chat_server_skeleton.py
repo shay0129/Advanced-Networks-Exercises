@@ -1,6 +1,8 @@
+# chat_server_skeleton.py - A simple chat server that accepts multiple clients and handles chat commands
+
 import socket
 import select
-import protocol
+import chat_protocol_skeleton as protocol
 
 SERVER_IP = "0.0.0.0"
 

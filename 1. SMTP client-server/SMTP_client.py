@@ -1,3 +1,5 @@
+# SMTP_client.py - A simple SMTP client that sends an email using the SMTP protocol
+
 import socket
 import base64
 import SMTP_protocol

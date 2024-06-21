@@ -1,3 +1,5 @@
+# SMTP_server.py - A simple SMTP server that requires authentication to send emails
+
 import socket
 import base64
 import SMTP_protocol
