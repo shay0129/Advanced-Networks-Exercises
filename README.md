@@ -1,7 +1,3 @@
-Yes, this is the main README for the repository, providing an overview of the various Python networking exercises and detailed instructions for each project. Here's the complete README:
-
----
-
 ### Python Networking Exercises
 
 This repository contains a collection of Python networking exercises and projects focusing on various aspects of network communication and protocols.
@@ -77,7 +73,18 @@ Run the client script on each client machine:
 - `MSG <name> <message>`: Send message to specified user.
 - `EXIT`: Disconnect from chat.
 
-### Exercise 3: DNS Enumeration
+### Exercise 2: Multiple Clients Chat Application
+//
+
+//
+
+//
+
+//
+
+//
+
+### Exercise 4: DNS Enumeration
 
 **Description:**
 Implementing a DNS enumeration tool to retrieve DNS records for a given domain using Python.
@@ -101,7 +108,7 @@ To enumerate DNS records for `example.com`:
 python dns_enumeration.py example.com
 ```
 
-### Exercise 4: HTTP Server
+### Exercise 5: HTTP Server
 
 **Description:**
 Implementing a basic HTTP server to handle GET and POST requests.
