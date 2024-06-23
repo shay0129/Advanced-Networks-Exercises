@@ -1,4 +1,13 @@
-### Review of README
+### HTTP Server
+
+**Overview**
+
+HTTP Server:
+
+Implemented a basic HTTP server capable of handling GET and POST requests.
+Developed http_server.py to manage client connections and serve HTTP responses.
+Demonstrated understanding of HTTP/1.1 protocol and web server functionalities.
+
 
 #### HTTP_server_shell.py
 

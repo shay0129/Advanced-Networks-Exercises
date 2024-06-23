@@ -1,5 +1,14 @@
 ### Multiple Client Chat - Client, Server, and Protocol
 
+**Overview**
+
+Multiple Clients Chat Application:
+
+Built a chat application supporting multiple clients connecting to a central server.
+Designed and implemented chat_client_skeleton.py and chat_server_skeleton.py for client-server communication.
+Utilized a custom protocol defined in protocol.py to handle commands such as setting usernames, sending messages, and retrieving user lists.
+Ensured asynchronous handling of client sessions for efficient real-time communication.
+
 #### Chat Client
 
 **Overview**

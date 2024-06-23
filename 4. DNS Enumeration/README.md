@@ -4,6 +4,13 @@
 
 The `dnsenum.py` script harnesses the capabilities of Scapy to perform DNS enumeration for a specified domain. It systematically queries common subdomains and retrieves their corresponding IP addresses, focusing on DNS querying and resolution functionalities.
 
+//
+DNS Enumeration Tool:
+
+Developed dns_enumeration.py, a tool to retrieve DNS records for a given domain using Python.
+Demonstrated proficiency in DNS protocols and network security practices.
+Implemented command-line interface for user input and result display.
+
 **Features and Functionality**
 
 **Subdomains Enumeration:**

@@ -1,5 +1,14 @@
 ### SMTP Client, Server, and Protocol
 
+**Overview**
+
+SMTP Client and Server:
+
+Created a basic SMTP client-server interaction for sending emails using Python sockets.
+Developed SMTP_client.py for client-side email sending and SMTP_server.py for server-side email processing.
+Defined constants and protocols in SMTP_protocol.py to standardize client-server communication.
+Implemented authentication handling using the AUTH LOGIN method with base64-encoded credentials.
+
 #### SMTP Client
 
 **Overview**
