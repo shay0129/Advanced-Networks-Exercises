@@ -22,7 +22,7 @@
   </component>
   <component name="ProjectId" id="2i49RMUTB8paFI3ZV4f3YoDbosm" />
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/5. HTTP Server" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
     <property name="restartRequiresConfirmation" value="false" />
   </component>
   <component name="RecentsManager">
@@ -47,7 +47,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.HTTP_server_shell">
+  <component name="RunManager" selected="Python.SMTP_client">
     <configuration name="HTTP_server_shell" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Advenced Networks Exercises" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -61,6 +61,27 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/5. HTTP Server/HTTP_server_shell.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="SMTP_client" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Advenced Networks Exercises" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/1. SMTP client-server" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/1. SMTP client-server/SMTP_client.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -111,27 +132,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="scapy2" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="Advenced Networks Exercises" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Scapy" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Scapy/scapy2.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="tar" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Advenced Networks Exercises" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -155,11 +155,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.SMTP_client" />
         <item itemvalue="Python.HTTP_server_shell" />
         <item itemvalue="Python.dnsenum" />
         <item itemvalue="Python.create_soa_query" />
         <item itemvalue="Python.tar" />
-        <item itemvalue="Python.scapy2" />
       </list>
     </recent_temporary>
   </component>

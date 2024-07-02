@@ -140,27 +140,7 @@ This repository includes exercises for implementing SMTP client-server communica
 
 
 
-
-
-
-
-
-
-
-
-Multiple Clients Chat Application:
-
-Built a chat application supporting multiple clients connecting to a central server.
-Designed and implemented chat_client_skeleton.py and chat_server_skeleton.py for client-server communication.
-Utilized a custom protocol defined in protocol.py to handle commands such as setting usernames, sending messages, and retrieving user lists.
-Ensured asynchronous handling of client sessions for efficient real-time communication.
-DNS Enumeration Tool:
-
-Developed dns_enumeration.py, a tool to retrieve DNS records for a given domain using Python.
-Demonstrated proficiency in DNS protocols and network security practices.
-Implemented command-line interface for user input and result display.
-HTTP Server:
-
-Implemented a basic HTTP server capable of handling GET and POST requests.
-Developed http_server.py to manage client connections and serve HTTP responses.
-Demonstrated understanding of HTTP/1.1 protocol and web server functionalities.
+git init
+git add .
+git commit -m "23.6.24"
+git push -u origin main
