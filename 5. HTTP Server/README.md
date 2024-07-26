@@ -41,3 +41,7 @@ Demonstrated understanding of HTTP/1.1 protocol and web server functionalities.
 #### Conclusion
 
 In conclusion, the README provides comprehensive insights into the functionality and design of the HTTP server implemented in `HTTP_server_shell.py` and its associated protocol management in `HTTP_protocol.py`. The clear delineation of constants, configuration parameters, functions, and handlers demonstrates a well-structured approach to server implementation, fostering scalability, reliability, and efficient client-server communication. Enhancements focusing on further error handling and scalability considerations would further augment the server's capabilities in diverse operational scenarios, ensuring its suitability for both educational and professional network application purposes.
+
+עבודה טובה!
+
+הקוד מעולה ברובו, אבל ישנו שימוש שגוי בשגיאה 302 - השגיאה הזו אמורה לסמן שמשאב מסוים הוזז למיקום אחר, אך כאשר מנסים לגשת למשאב...

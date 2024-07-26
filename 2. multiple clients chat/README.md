@@ -95,3 +95,17 @@ The `chat_client_skeleton.py` script provides a foundational implementation of a
 ### Conclusion
 
 Collectively, `chat_client_skeleton.py`, `chat_server_skeleton.py`, and `chat_protocol_skeleton.py` constitute a foundational framework for building a basic chat application using Python sockets. Their modular design, clear command structure, and robust error handling mechanisms exemplify fundamental principles in client-server communication. Enhancements in documentation, error management, and scalability considerations will further strengthen these scripts for developing more sophisticated and scalable chat systems in the future. Overall, they provide a solid starting point for implementing reliable and efficient chat applications while maintaining clarity and simplicity in design.
+
+עבודה טובה, מספר הערות:
+
+1. שים לב להגיש בזמן!
+
+2. יש לטפל בהערות pep8
+
+3. מודפס פעמיים ללקוח להכניס מידע בכל פעם, אחד לפני שהשרת עונה ואחד אחרי
+
+4. הפונקציות של שליחת וקבלת מידע צריך להתנהל בפרוטוקול ולא רק קבועים...
+
+5. אין אינדיקציה מספיק טובה ללקוח כשהוא מכניס הודעה לא תקינה מסיבה זו או אחרת
+
+6. פעולת EXIT מקריסה את הלקוח וכך גם לגבי סגירה אלימה של לקוח
