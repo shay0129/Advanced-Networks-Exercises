@@ -37,8 +37,8 @@ def check_file_inclusion(suspected_ips_file, detected_ips_file):
 
 
 if __name__ == "__main__":
-    file2_path = "7.SynFlood/attackers_ips.txt" 
-    file1_path = "7.SynFlood/attackersListFiltered.txt"
+    file1_path = "7.SynFlood/attackers_ips.txt" 
+    file2_path = "7.SynFlood/attackersListFiltered.txt"
 
     check_file_inclusion(file1_path, file2_path)
 

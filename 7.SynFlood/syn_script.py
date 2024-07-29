@@ -3,15 +3,6 @@ from collections import defaultdict
 import ipaddress
 
 def read_ips_from_file(file_path):
-    """
-    Reads IP addresses from a file and returns them as a set.
-
-    Args:
-        file_path (str): Path to the file containing IP addresses.
-
-    Returns:
-        set: A set of IP addresses read from the file.
-    """
     try:
         with open(file_path, 'r') as f:
             return set(line.strip() for line in f)
@@ -24,26 +15,22 @@ def read_ips_from_file(file_path):
     except Exception as e:
         print(f"Unexpected error: {e}")
         return set()
+    
+def logic_detect_attackers(ip_count, ip_timestamps, packets, attacked_network, syn_threshold, time_window):
+    """
+    Detect potential attackers based on SYN packet traffic.
 
-def identify_attackers(pcap_file, attackers_list_file, attacked_network_range, syn_threshold=5, time_window=60):
-    try:
-        # Read the pcap file
-        packets = rdpcap(pcap_file) 
-    except FileNotFoundError:
-        print(f"Error: The file {pcap_file} was not found.")
-        return
-    except Exception as e:
-        print(f"Error reading the file: {e}")
-        return
+    Parameters:
+    - ip_count: Dictionary to track the number of SYN packets per IP.
+    - ip_timestamps: Dictionary to record the timestamps of SYN packets.
+    - packets: List of packets from the PCAP file.
+    - attacked_network: The network range under attack.
+    - syn_threshold: The number of SYN packets to consider suspicious.
+    - time_window: The time window to analyze SYN packet timing.
 
-    known_attackers = read_ips_from_file(attackers_list_file)
-    # Convert attacked_network_range to an ip_network object
-    attacked_network = ipaddress.ip_network(attacked_network_range, strict=False)
-
-    # Dictionary to store the count of SYN packets per IP
-    ip_count = defaultdict(int) 
-    ip_timestamps = defaultdict(list)  
-
+    Returns:
+    - A set of IP addresses suspected of being attackers.
+    """
     for pkt in packets:
         if TCP in pkt and IP in pkt:
             src_ip = pkt[IP].src
@@ -63,9 +50,29 @@ def identify_attackers(pcap_file, attackers_list_file, attacked_network_range, s
             timestamps = ip_timestamps[ip]
             if max(timestamps) - min(timestamps) <= time_window:
                 suspected_attackers.add(ip)
+    return suspected_attackers
+
+def identify_attackers(pcap_file, attackers_list_file, attacked_network_range, 
+                       syn_threshold=5, time_window=60 ):
+    try:
+        # Read the pcap file
+        packets = rdpcap(pcap_file) 
+    except FileNotFoundError:
+        print(f"Error: The file {pcap_file} was not found.")
+        return
+    except Exception as e:
+        print(f"Error reading the file: {e}")
+        return
+
+    # Dictionary to store the count of SYN packets per IP
+    ip_count = defaultdict(int) 
+    ip_timestamps = defaultdict(list) 
+    known_attackers = read_ips_from_file(attackers_list_file)
+    # Convert attacked_network_range to an ip_network object
+    attacked_network = ipaddress.ip_network(attacked_network_range, strict=False)
 
     # Compare with known attackers
-    detected_attackers = suspected_attackers
+    detected_attackers = logic_detect_attackers(ip_count, ip_timestamps, packets, attacked_network, syn_threshold, time_window)
     missing_attackers = known_attackers - detected_attackers
     excess_attackers = detected_attackers - known_attackers
     
@@ -87,3 +94,4 @@ if __name__ == "__main__":
     attacked_network_range = "100.64.0.0/16"
     
     identify_attackers(pcap_file_path, attackers_list_file, attacked_network_range)
+
