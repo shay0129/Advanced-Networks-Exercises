@@ -1,0 +1,6 @@
+# requirements.txt - pip install -r requirements.txt
+pyopenssl
+git+https://github.com/secdev/scapy
+cryptography
+
+
