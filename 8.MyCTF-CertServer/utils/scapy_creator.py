@@ -1,3 +1,4 @@
+import os
 from scapy.all import IP, TCP, wrpcap
 from scapy.layers.tls.handshake import TLSClientHello, TLSServerHello, TLSClientKeyExchange, TLSFinished, TLSServerHelloDone
 from scapy.layers.tls.record import TLS
@@ -5,13 +6,16 @@ from scapy.layers.http import HTTPRequest, HTTPResponse
 from scapy.layers.http import Raw
 
 # Initialize global sequence number
-seq_num = 1000  # You can start from any arbitrary number
+seq_num = 1000
 
 # Define IP addresses for server and clients
 server_ip = "192.168.1.1"
 client1_ip = "192.168.1.2"  # Client with cert
 client2_ip = "192.168.1.3"  # Client without cert
 CN = "Pasdaran.local"
+
+# Define pre-master secret
+pre_master_secret = bytes.fromhex("4034f2bab441bf2e4fac825c578946f84dfcbd16c75349676863411ae44bee84fd3b2e6e7eb0d241e9daca8240e21a9b")
 
 def create_tcp_packet(src_ip, dst_ip, sport, dport, flags, seq=0, ack=0):
     global seq_num
@@ -25,12 +29,18 @@ def create_tls_packet(src_ip, dst_ip, sport, dport, tls_message, seq=0, ack=0):
 def create_http_packet(src_ip, dst_ip, sport, dport, http_message, body=b"", seq=0, ack=0):
     return create_tcp_packet(src_ip, dst_ip, sport, dport, "PA", seq, ack) / http_message / Raw(load=body)
 
+def write_sslkeylog(pre_master_secret):
+    log_file = os.environ.get('SSLKEYLOGFILE', 'sslkeylog.log')
+    if log_file:
+        with open(log_file, "a") as f:
+            f.write(f"CLIENT_RANDOM {os.urandom(32).hex()} {pre_master_secret.hex()}\n")
+
 def create_ssl_handshake(client_ip, use_cert=False):
     global seq_num
 
     # Client Hello
     client_hello = TLSClientHello()
-    cipher_suites = [0xc02b, 0xc02f, 0xc030, 0xc00a]  # Example cipher suites
+    cipher_suites = [0xc02b, 0xc02f, 0xc030, 0xc00a]
     client_hello.cipher_suites = cipher_suites
 
     # Server Hello
@@ -39,14 +49,17 @@ def create_ssl_handshake(client_ip, use_cert=False):
         try:
             with open(f"{CN}.crt", "rb") as f:
                 cert_data = f.read()
-            server_hello.certificates = cert_data  # Assuming the certificate is in DER format
+            server_hello.certificates = cert_data
         except FileNotFoundError as e:
             print(f"Error loading certificate: {e}")
             return []
 
     server_hello_done = TLSServerHelloDone()
 
+    # Use the pre-master secret
     client_key_exchange = TLSClientKeyExchange()
+    client_key_exchange.key = pre_master_secret  # This is a simplification; actual implementation depends on the TLS version and specifics
+
     client_finished = TLSFinished()
     server_finished = TLSFinished()
 
@@ -59,20 +72,22 @@ def create_ssl_handshake(client_ip, use_cert=False):
         create_tls_packet(client_ip, server_ip, 443, 443, client_finished),
         create_tls_packet(server_ip, client_ip, 443, 443, server_finished)
     ]
+
+    write_sslkeylog(pre_master_secret)
     return packets
 
 # Main Logic
 packets = []
 
 # Handshake with certificate
-packets += create_ssl_handshake(client1_ip, use_cert=True) 
+packets += create_ssl_handshake(client1_ip, use_cert=True)
 packets += [
     create_http_packet(client1_ip, server_ip, 443, 443, HTTPRequest(Method="GET", Path="/resource"), body=b""),
     create_http_packet(server_ip, client1_ip, 443, 443, HTTPResponse(Status_Code=200, Reason_Phrase="OK"), body=b"Resource Data")
 ]
 
 # Handshake without certificate
-packets += create_ssl_handshake(client2_ip, use_cert=False)  
+packets += create_ssl_handshake(client2_ip, use_cert=False)
 packets += [
     create_http_packet(client2_ip, server_ip, 443, 443, HTTPRequest(Method="GET", Path="/resource"), body=b""),
     create_http_packet(server_ip, client2_ip, 443, 443, HTTPResponse(Status_Code=400, Reason_Phrase="Bad Request"), body=b"Missing Certificate")
