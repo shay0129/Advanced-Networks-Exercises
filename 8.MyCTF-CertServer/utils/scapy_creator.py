@@ -1,65 +1,48 @@
-import os
 from scapy.all import IP, TCP, wrpcap
-from scapy.layers.tls.handshake import TLSClientHello, TLSServerHello, TLSClientKeyExchange, TLSFinished, TLSServerHelloDone
 from scapy.layers.tls.record import TLS
-from scapy.layers.http import HTTPRequest, HTTPResponse
-from scapy.layers.http import Raw
+from scapy.layers.tls.handshake import (
+    TLSClientHello, TLSServerHello, TLSCertificate, 
+    TLSClientKeyExchange, TLSFinished, TLSServerHelloDone
+)
 
 # Initialize global sequence number
 seq_num = 1000
 
 # Define IP addresses for server and clients
 server_ip = "192.168.1.1"
-client1_ip = "192.168.1.2"  # Client with cert
-client2_ip = "192.168.1.3"  # Client without cert
+client1_ip = "192.168.1.2"
 CN = "Pasdaran.local"
 
-# Define pre-master secret
-pre_master_secret = bytes.fromhex("4034f2bab441bf2e4fac825c578946f84dfcbd16c75349676863411ae44bee84fd3b2e6e7eb0d241e9daca8240e21a9b")
-
-def create_tcp_packet(src_ip, dst_ip, sport, dport, flags, seq=0, ack=0):
+def create_tcp_packet(src_ip: str, dst_ip: str, sport: int, dport: int, flags: str, seq: int = 0, ack: int = 0) -> TCP:
     global seq_num
-    packet = IP(src=src_ip, dst=dst_ip) / TCP(sport=sport, dport=dport, flags=flags, seq=seq_num, ack=ack)
-    seq_num += len(packet[TCP].payload)
+    packet = IP(src=src_ip, dst=dst_ip) / TCP(sport=sport, dport=dport, flags=flags, seq=seq_num if seq == 0 else seq, ack=ack)
+    seq_num += len(packet[TCP].payload) if packet.haslayer(TCP) else 0
+    print(f"Created TCP Packet: {packet.summary()}")
     return packet
 
-def create_tls_packet(src_ip, dst_ip, sport, dport, tls_message, seq=0, ack=0):
-    return create_tcp_packet(src_ip, dst_ip, sport, dport, "PA", seq, ack) / TLS(msg=[tls_message])
+def create_tls_packet(src_ip: str, dst_ip: str, sport: int, dport: int, tls_message, seq: int = 0, ack: int = 0) -> TLS:
+    tcp_packet = create_tcp_packet(src_ip, dst_ip, sport, dport, "PA", seq, ack)
+    tls_packet = tcp_packet / TLS(msg=[tls_message])
+    print(f"Created TLS Packet: {tls_packet.summary()}")
+    return tls_packet
 
-def create_http_packet(src_ip, dst_ip, sport, dport, http_message, body=b"", seq=0, ack=0):
-    return create_tcp_packet(src_ip, dst_ip, sport, dport, "PA", seq, ack) / http_message / Raw(load=body)
-
-def write_sslkeylog(pre_master_secret):
-    log_file = os.environ.get('SSLKEYLOGFILE', 'sslkeylog.log')
-    if log_file:
-        with open(log_file, "a") as f:
-            f.write(f"CLIENT_RANDOM {os.urandom(32).hex()} {pre_master_secret.hex()}\n")
-
-def create_ssl_handshake(client_ip, use_cert=False):
+def create_ssl_handshake(client_ip: str, use_cert: bool = False) -> list:
     global seq_num
 
     # Client Hello
     client_hello = TLSClientHello()
-    cipher_suites = [0xc02b, 0xc02f, 0xc030, 0xc00a]
+    cipher_suites = [0xc02b, 0xc02f, 0xc030, 0xc00a]  # Example cipher suites
     client_hello.cipher_suites = cipher_suites
+    print(f"Client Hello: {client_hello.summary()}")
 
     # Server Hello
     server_hello = TLSServerHello()
-    if use_cert:
-        try:
-            with open(f"{CN}.crt", "rb") as f:
-                cert_data = f.read()
-            server_hello.certificates = cert_data
-        except FileNotFoundError as e:
-            print(f"Error loading certificate: {e}")
-            return []
+    print(f"Server Hello: {server_hello.summary()}")
 
+    cert_layer = TLSCertificate()
+        
     server_hello_done = TLSServerHelloDone()
-
-    # Use the pre-master secret
     client_key_exchange = TLSClientKeyExchange()
-    client_key_exchange.key = pre_master_secret  # This is a simplification; actual implementation depends on the TLS version and specifics
-
     client_finished = TLSFinished()
     server_finished = TLSFinished()
 
@@ -67,34 +50,29 @@ def create_ssl_handshake(client_ip, use_cert=False):
     packets = [
         create_tls_packet(client_ip, server_ip, 443, 443, client_hello),
         create_tls_packet(server_ip, client_ip, 443, 443, server_hello),
+    ]
+
+    if cert_layer:
+        packets.append(create_tls_packet(server_ip, client_ip, 443, 443, cert_layer))
+        
+    packets += [
         create_tls_packet(server_ip, client_ip, 443, 443, server_hello_done),
         create_tls_packet(client_ip, server_ip, 443, 443, client_key_exchange),
-        create_tls_packet(client_ip, server_ip, 443, 443, client_finished),
+        create_tls_packet(server_ip, client_ip, 443, 443, client_finished),
         create_tls_packet(server_ip, client_ip, 443, 443, server_finished)
     ]
 
-    write_sslkeylog(pre_master_secret)
     return packets
 
 # Main Logic
-packets = []
+packets = create_ssl_handshake(client1_ip, use_cert=True)
 
-# Handshake with certificate
-packets += create_ssl_handshake(client1_ip, use_cert=True)
-packets += [
-    create_http_packet(client1_ip, server_ip, 443, 443, HTTPRequest(Method="GET", Path="/resource"), body=b""),
-    create_http_packet(server_ip, client1_ip, 443, 443, HTTPResponse(Status_Code=200, Reason_Phrase="OK"), body=b"Resource Data")
-]
-
-# Handshake without certificate
-packets += create_ssl_handshake(client2_ip, use_cert=False)
-packets += [
-    create_http_packet(client2_ip, server_ip, 443, 443, HTTPRequest(Method="GET", Path="/resource"), body=b""),
-    create_http_packet(server_ip, client2_ip, 443, 443, HTTPResponse(Status_Code=400, Reason_Phrase="Bad Request"), body=b"Missing Certificate")
-]
-
-try:
-    wrpcap("tls_traffic.pcap", packets)
-    print("PCAP file created successfully.")
-except Exception as e:
-    print(f"An error occurred while creating the PCAP file: {e}")
+# Check if packets are created
+if not packets:
+    print("No packets were created.")
+else:
+    try:
+        wrpcap("tls_traffic.pcap", packets)
+        print("PCAP file created successfully.")
+    except Exception as e:
+        print(f"An error occurred while creating the PCAP file: {e}")
