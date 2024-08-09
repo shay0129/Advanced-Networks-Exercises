@@ -22,8 +22,8 @@ ack_num_client2 = 0
 def create_ssl_handshake(client_ip: str, server_ip: str, seq_num: int, ack_num: int, use_cert: bool = False) -> list:
     packets = []
 
-    # Client Hello
-    client_hello = TLSClientHello()
+    # Client Hello 
+    client_hello = TLSClientHello() # 120 bytes
     packet = create_tls_packet(
         client_ip,
         server_ip,
@@ -31,18 +31,17 @@ def create_ssl_handshake(client_ip: str, server_ip: str, seq_num: int, ack_num: 
         dport=443,
         tls_message=client_hello,
         seq=seq_num,
-        ack=ack_num
+        ack=ack_num  # Assuming ack_num is initialized correctly at the beginning
     )
-    seq_num += len(client_hello)
-    ack_num += len(client_hello) 
+    seq_num += 120 #len(packet)  # Update SEQ number based on the entire packet length
     packets.append(packet)
 
-    # Server Hello, Certificate (optional), Server Hello Done
-    server_hello = TLSServerHello()
+    # Server Hello, Certificate (optional), Server Hello Done 
+    server_hello = TLSServerHello() # 58 bytes
     server_records = server_hello 
     if use_cert:
         server_records /= TLSCertificate() 
-        
+
     server_records /= TLSServerHelloDone()
     packet = create_tls_packet(
         server_ip,
@@ -50,15 +49,15 @@ def create_ssl_handshake(client_ip: str, server_ip: str, seq_num: int, ack_num: 
         sport=443,
         dport=443,
         tls_message=server_records,
-        seq=seq_num,
-        ack=ack_num
+        seq=ack_num,  # Acknowledgment number is the client's sequence number
+        ack=seq_num  # Client's sequence number is acknowledged by the server
     )
-    seq_num += len(server_records)
-    ack_num += len(server_records) 
+    ack_num += 58 #len(packet)  # Update ACK number based on the entire packet length received from the server
     packets.append(packet)
 
+
     # Client Key Exchange, Change Cipher Spec, Finished
-    client_key_exchange = TLSClientKeyExchange()
+    client_key_exchange = TLSClientKeyExchange() # 14 bytes
     change_cipher_spec_client = TLSChangeCipherSpec()
     finished_client = TLSFinished()
     client_records = client_key_exchange / change_cipher_spec_client / finished_client
@@ -68,16 +67,16 @@ def create_ssl_handshake(client_ip: str, server_ip: str, seq_num: int, ack_num: 
         server_ip,
         sport=443,
         dport=443,
-        tls_message=client_records,  # List of messages
-        seq=seq_num,
-        ack=ack_num
+        tls_message=client_records,
+        seq=seq_num,  # Client's sequence number for this packet
+        ack=ack_num  # Client acknowledges the last server records
     )
-    seq_num += len(client_records)
-    ack_num += len(client_records) 
+    seq_num += 14 #len(client_records)  # Update SEQ number based on client records length
+    #ack_num += len(client_records)  # Simulate server's response length (or adjust as needed)
     packets.append(packet)
 
     # Server Change Cipher Spec, Finished
-    change_cipher_spec_server = TLSChangeCipherSpec()
+    change_cipher_spec_server = TLSChangeCipherSpec() # 10 bytes
     finished_server = TLSFinished()
     server_records = change_cipher_spec_server / finished_server
     packet = create_tls_packet(
@@ -86,19 +85,20 @@ def create_ssl_handshake(client_ip: str, server_ip: str, seq_num: int, ack_num: 
         sport=443,
         dport=443,
         tls_message=server_records,
-        seq=seq_num,
-        ack=ack_num
+        seq=ack_num,  # Acknowledgment number from the client (for server response)
+        ack=seq_num  # Server acknowledges the client's Finished message
     )
-    seq_num += len(server_records)
-    ack_num += len(server_records) 
+    #seq_num += len(server_records)  # Update server's SEQ number based on server records length
+    ack_num += 10 #len(server_records)  # Simulate client's response length (or adjust as needed)
     packets.append(packet)
 
     return packets, seq_num, ack_num
 
+
 def create_application_data_packet(src_ip: str, dst_ip: str, sport: int, dport: int, data: bytes, seq: int = 0, ack: int = 0) -> TLS:
     # Construct the TLS Application Data packet
-    tls_data_packet = create_tcp_packet(src_ip, dst_ip, sport, dport, "PA", seq, ack) / TLS(msg=[TLSApplicationData(data)])
-    seq += len(data)
+    tls_data_packet = create_tcp_packet(src_ip, dst_ip, sport, dport, "PA", seq, ack) / TLS(msg=[TLSApplicationData(data)]) #54 bytes
+    seq += 54 #len(data)
     return tls_data_packet, seq
 
 def main():
