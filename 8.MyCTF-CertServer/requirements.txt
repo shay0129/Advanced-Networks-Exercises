@@ -2,5 +2,6 @@
 pyopenssl
 git+https://github.com/secdev/scapy
 cryptography
-
+sslkeylog
+scapy==2.4.5
 
