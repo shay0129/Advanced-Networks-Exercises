@@ -33,66 +33,65 @@ def create_ssl_handshake(client_ip: str, server_ip: str, seq_num: int, ack_num: 
         seq=seq_num,
         ack=ack_num
     )
-    packets.append(packet)
     seq_num += len(client_hello)
     ack_num += len(client_hello) 
+    packets.append(packet)
 
     # Server Hello, Certificate (optional), Server Hello Done
     server_hello = TLSServerHello()
-    server_messages = server_hello 
+    server_records = server_hello 
     if use_cert:
-        server_messages /= TLSCertificate() 
+        server_records /= TLSCertificate() 
         
-    server_messages /= TLSServerHelloDone()
+    server_records /= TLSServerHelloDone()
     packet = create_tls_packet(
         server_ip,
         client_ip,
         sport=443,
         dport=443,
-        tls_message=server_messages,
+        tls_message=server_records,
         seq=seq_num,
         ack=ack_num
     )
+    seq_num += len(server_records)
+    ack_num += len(server_records) 
     packets.append(packet)
-    seq_num += len(server_messages)
-    ack_num += len(server_messages) 
 
     # Client Key Exchange, Change Cipher Spec, Finished
     client_key_exchange = TLSClientKeyExchange()
     change_cipher_spec_client = TLSChangeCipherSpec()
     finished_client = TLSFinished()
+    client_records = client_key_exchange / change_cipher_spec_client / finished_client
 
     packet = create_tls_packet(
         client_ip,
         server_ip,
         sport=443,
         dport=443,
-        tls_message=[client_key_exchange, change_cipher_spec_client, finished_client],  # List of messages
+        tls_message=client_records,  # List of messages
         seq=seq_num,
         ack=ack_num
     )
+    seq_num += len(client_records)
+    ack_num += len(client_records) 
     packets.append(packet)
-
-    seq_num += len(client_key_exchange) + 1 + len(finished_client)  # 1 for ChangeCipherSpec
-    ack_num += len(server_messages) 
 
     # Server Change Cipher Spec, Finished
     change_cipher_spec_server = TLSChangeCipherSpec()
     finished_server = TLSFinished()
-
+    server_records = change_cipher_spec_server / finished_server
     packet = create_tls_packet(
         server_ip,
         client_ip,
         sport=443,
         dport=443,
-        tls_message=[change_cipher_spec_server, finished_server],  # List of messages
+        tls_message=server_records,
         seq=seq_num,
         ack=ack_num
     )
+    seq_num += len(server_records)
+    ack_num += len(server_records) 
     packets.append(packet)
-
-    seq_num += 1 + len(finished_server)  # 1 for ChangeCipherSpec
-    ack_num += len(client_key_exchange) + 1 + len(finished_client)
 
     return packets, seq_num, ack_num
 
