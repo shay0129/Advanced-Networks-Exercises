@@ -25,9 +25,15 @@ def create_tcp_packet(src_ip: str, dst_ip: str, sport: int, dport: int, flags: s
 def create_tls_packet(src_ip: str, dst_ip: str, sport: int, dport: int, tls_message, seq: int = 0, ack: int = 0) -> TLS:
     # Create a TLS packet with the specified parameters
     tcp_packet = create_tcp_packet(src_ip, dst_ip, sport, dport, "PA", seq, ack)
-    tls_packet = tcp_packet / TLS(msg=[tls_message])
+
+    # Ensure tls_message is always a list, even if it's a single message
+    if not isinstance(tls_message, list):
+        tls_message = [tls_message]
+
+    tls_packet = tcp_packet / TLS(msg=tls_message)
     print(f"Created TLS Packet: {tls_packet.summary()}")
     return tls_packet
+
 
 # Layer 5
 def create_http_packet(src_ip: str, dst_ip: str, sport: int, dport: int, flags: str, seq: int = 0, ack: int = 0) -> TCP:
